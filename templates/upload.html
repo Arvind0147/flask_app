@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload to GCP Bucket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .progress {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+        }
+
+        .progress-text {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload a file to GCP bucket</h1>
+        <form id="uploadForm">
+            <input type="file" id="fileInput" name="file" required>
+            <input type="submit" value="Upload">
+        </form>
+
+        <div class="progress" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-text" id="progressText">0%</div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent form from submitting the default way
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show progress bar
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            progressContainer.style.display = 'block';
+
+            // Simulate an API call to upload file
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload');  // Replace with your server endpoint
+
+            // Update progress bar during upload
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = percentComplete + '%';
+                    progressText.textContent = percentComplete + '%';
+                }
+            };
+
+            // Handle success or error
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('File uploaded successfully!');
+                } else {
+                    alert('Failed to upload file.');
+                }
+            };
+
+            xhr.onerror = function() {
+                alert('Error while uploading file.');
+            };
+
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>
